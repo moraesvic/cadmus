@@ -1,0 +1,6 @@
+[submodule "mkheader"]
+	path = mkheader
+	url = https://github.com/moraesvic/mkheader
+[submodule "bash_common"]
+	path = common
+	url = https://github.com/moraesvic/bash_common.git
