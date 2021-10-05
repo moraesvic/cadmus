@@ -1,0 +1,24 @@
+#!/bin/bash
+
+############################################################
+# Find path to libraries
+
+if [ -z "$lib" ] ; then
+    thisdir="$(dirname "$0")"
+    if [ -d "$thisdir/../lib" ] ; then
+        export lib="$thisdir/../lib"
+    else
+        export lib="$thisdir"
+    fi
+fi
+
+libs=("common" "mkheader")
+for library in "${libs[@]}" ; do
+    if [ ! -d "$lib" ] ; then
+        >&2 echo "ERROR Could not find library $library. Exiting..."
+        exit 1
+    fi
+done
+
+for f in "$lib/common/"* ; do source "$f" ; done
+export root=$(getroot)
