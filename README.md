@@ -6,7 +6,7 @@
 
 When we are developing a full stack system, there are some important settings that are practically repeated for every project. It is not always easy to remember, months later, how a specific technical issue was solved, or why a certain decision was taken. To replicate all of that in the client's machine and guarantee that the program is up to the highest level of quality can be even harder.
 
-## A installer is born
+## An installer is born
 
 As they say, necessity is the mother of invention, and I have decided to create my own installer — which I named Cadmus. After minutious testing, it is ready to be imported as a library in my new projects employing PostgreSQL. It creates a new user for the database with his/her credentials and permissions, configures the .env file with the environment variables, and, last but not least, populates the tables of the database with test data.
 
