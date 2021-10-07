@@ -11,7 +11,7 @@ print_header="$lib/mkheader/long_header"
 ############################################################
 # Checking whether environment file exists
 
-environment_file="../.env"
+environment_file="$root/../.env"
 
 # If file exists and has not zero size
 if [ -s "$environment_file" ] ; then
@@ -91,12 +91,15 @@ function warning {
 	>&2 echo -e "${yellow}${1}${no_color}"
 }
 
-if [ -d "../.git" ] ; then
-	if [ ! -f "../.gitignore" \
-		-o -z "$(grep -E "^.env$" "../.gitignore")" ] ; then
+gitdir="$root/../.git"
+gitignore="$root/../.gitignore"
+
+if [ -d "$gitdir" ] ; then
+	if [ ! -f "$gitignore" \
+		-o -z "$(grep -E "^.env$" "$gitignore")" ] ; then
 
 		warning "You are working within a Git repository, but you have no .gitignore file, or you have one, but it is not set to ignore .env file. Adding this setting..."
-		echo ".env" >> "../.gitignore"
+		echo ".env" >> "$gitignore"
 
 	fi
 else
