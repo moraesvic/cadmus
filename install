@@ -81,6 +81,28 @@ You can now log in to psql with the command:
 Then type in the password: ''$passwd''.
 EOF
 
+############################################################
+# Pasting to environment file
+
+# First we must be sure that, if we are working in a Git repository,
+# the new file will not be uploaded to Git
+
+function warning {
+	>&2 echo -e "${yellow}${1}${no_color}"
+}
+
+if [ -d "../.git" ] ; then
+	if [ ! -f "../.gitignore" \
+		-o -n "$(grep -E "^.env$" "../.gitignore")" ] ; then
+
+		warning "You are working within a Git repository, but you have no .gitignore file, or you have one, but it is not set to ignore .env file. Adding this setting..."
+		echo ".env" >> "../.gitignore"
+
+	fi
+else
+	warning "You don't seem to be working within a Git repository. If you intend to upload this directory to Git later, be sure to add and configure .gitignore file properly, or the credentials to your database will be online!"
+fi
+
 cat > "$environment_file" << EOF 
 POSTGRES_USER=$uname
 POSTGRES_PASSWORD=$passwd
