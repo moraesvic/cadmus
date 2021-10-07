@@ -8,7 +8,7 @@ print_header="$lib/mkheader/short_header"
 ############################################################
 # Checking environment file
 
-environment_file="../.env"
+environment_file="$root/../.env"
 if [ ! -s "$environment_file" ] ; then
 	>&2 echo -e "${error} There is no environment file. Have you installed properly?"
 	exit 1
