@@ -124,7 +124,7 @@ EOF
 
 >&2 echo -e "\nWe will now populate the created database $db"
 
-for sql_file in sql/*.sql ; do
+for sql_file in "$root/sql/"*.sql ; do
     >&2 echo "Reading file $sql_file ..."
     >&2 PGPASSWORD="$passwd" psql -U "$uname" -h "$host" -d "$database" \
         -p "$port" -f "$sql_file"
