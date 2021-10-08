@@ -1,6 +1,93 @@
 #!/bin/bash
 
-source "$(dirname "$0")/lib/bash_common/init"
+function getxdir {
+	# This function outputs the directory of the executable
+	# that is running it -- without symbolic links
+	echo "$(cd "$(dirname "$0")"; pwd -P)"
+}
+
+function getscrdir {
+	# This gets the directory of the script file, no matter
+	# whether it was called by sourcing or ran directly
+
+	echo "$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd -P )"
+}
+
+function find_lib {
+	# This function finds whether the directory of the executable
+	# or any of the parent directories are a library directory
+
+	# If the option -h is passed, it will use the current path
+	# instead of the path of the executable
+
+	start_dir="$(pwd)"
+
+	for arg in "$@" ; do
+		if [ "$arg" = "-h" ] ; then
+			cd "$(getxdir)"
+			break
+		fi
+	done
+
+	while [[ ! -d "lib" \
+		&& ! "$(pwd -P)" == "/" ]] ; do
+	
+		cd ..
+	
+	done
+	
+	final_dir="$(pwd -P)"
+	
+	if [[ "$final_dir" == "/" ]] ; then
+		>&2 echo "No library directory found!"
+	else
+		echo "$final_dir/lib"
+	fi
+
+	cd "$start_dir"
+}
+
+
+function import_dep {
+	# Call this function with an array of dependencies, e.g.
+	# dep=("file_a" "file_b")
+	# import_dep "${dep[@]}"
+	#
+	# ... or simply ...
+	# import_dep file_a file_b file_c
+	
+	if [ -z "$lib" ] ; then
+    	export lib="$(find_lib)"
+	fi
+
+	if [ -z "$lib" ] ; then
+    	>&2 echo -e "Could not find directory with libraries! Exiting..."
+		exit 1
+	fi
+
+	for library in "$@" ; do
+    	if [ ! -d "$lib/$library" ] ; then
+        	>&2 echo -e "Could not find library $library. Exiting..."
+			exit 1
+    	fi
+
+		for f in "$lib/$library/"* ; do
+
+			# Is file executable?
+			#
+			# Is it a text executable? I don't want to sed into
+			# a binary file.
+			#
+			# Is it a bash file?
+
+			if [[ -x "$f" &&
+				  -n "$(file "$f" | grep -o "text")" && 
+				  -n "$(sed -n '1p' "$f" | grep -o "bash")" ]]
+				then source "$f"
+			fi
+		done
+	done
+}
 
 ############################################################
 # Import dependencies
