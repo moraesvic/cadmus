@@ -57,7 +57,7 @@ function import_dep {
 	# import_dep file_a file_b file_c
 	
 	if [ -z "$lib" ] ; then
-    	export lib="$(find_lib)"
+    	lib="$(find_lib 2> /dev/null)"
 	fi
 
 	if [ -z "$lib" ] ; then
