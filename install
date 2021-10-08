@@ -6,17 +6,26 @@ source "$(dirname "$0")/config"
 # Header
 
 print_header="$lib/mkheader/long_header"
->&2 $print_header
+>&2 $print_header -d "$xdir"
 
 ############################################################
 # Checking whether environment file exists
 
-environment_file="$root/../.env"
+gitdir="$(cd "$xdir" ; find_git 2> /dev/null )"
+
+if [ -z "$gitdir" ] ; then
+	>&2 warning << EOF
+You are not inside a git repository. We will create environment \
+file in the path of install executable.
+EOF
+	environment_file="$xdir/.env"
+else
+	environment_file="$gitdir/.env"
+fi
 
 # If file exists and has not zero size
 if [ -s "$environment_file" ] ; then
-	>&2 echo -e "${error} It seems like the environment file was already configured. If you would like to start from a fresh installation, please run ./uninstall first"
-	exit 1
+	fatalerr "It seems like the environment file was already configured. If you would like to start from a fresh installation, please run ./uninstall first."
 fi
 
 ############################################################
@@ -90,23 +99,7 @@ EOF
 # Not necessarily .git will be a directory. In case we are working
 # in a submodule, it could be a file (pointing to the parent module)
 
-gitdir="$root/../.git"
-gitignore="$root/../.gitignore"
-
-if [ -n "$(which git)" -a -e "$gitdir" ] ; then
-	echo -e "You seem to be working within a Git repository"
-	if [ ! -f "$gitignore" \
-		-o -z "$(grep -E "^.env$" "$gitignore")" ] ; then
-
-		warning "You have no .gitignore file, or you have one, but it is not set to ignore .env file. Adding this setting..."
-		echo ".env" >> "$gitignore"
-
-		warning "Unstaging .env file as a precaution"
-		git rm --cached "$environment_file" > /dev/null 2>&1
-		>&2 echo -e "${success}"
-
-	fi
-else
+if [ -z "$gitdir" ] ; then
 	warning << EOF
 
 You don't seem to be working within a Git repository. If you \
@@ -115,7 +108,22 @@ and configure .gitignore file properly, or the credentials to \
 your database will be exposed online!
 
 EOF
+else
+	gitignore="$gitdir/.gitignore"
+	echo -e "You seem to be working within a Git repository"
+	if [ ! -f "$gitignore" \
+		-o -z "$(grep -E "^.env$" "$gitignore")" ] ; then
 
+		warning << EOF
+You have no .gitignore file, or you have one, but it is not \
+set to ignore .env file. Adding this setting...
+EOF
+		echo ".env" >> "$gitignore"
+	
+		warning "Unstaging .env file as a precaution"
+		git rm --cached "$environment_file" > /dev/null 2>&1
+		>&2 echo -e "${success}"
+	fi	
 fi
 
 cat > "$environment_file" << EOF 
@@ -137,7 +145,7 @@ EOF
 
 >&2 echo -e "\nWe will now populate the created database $db"
 
-for sql_file in "$root/sql/"*.sql ; do
+for sql_file in "$xdir/sql/"*.sql ; do
     >&2 echo -e "Reading file $sql_file ... ${ok}"
     >&2 PGPASSWORD="$passwd" psql -U "$uname" -h "$host" -d "$database" \
         -p "$port" -f "$sql_file"

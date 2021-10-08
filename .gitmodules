@@ -1,6 +1,6 @@
-[submodule "mkheader"]
-	path = mkheader
+[submodule "lib/mkheader"]
+	path = lib/mkheader
 	url = https://github.com/moraesvic/mkheader
-[submodule "bash_common"]
-	path = common
-	url = https://github.com/moraesvic/bash_common.git
+[submodule "lib/bash_common"]
+	path = lib/bash_common
+	url = https://github.com/moraesvic/bash_common

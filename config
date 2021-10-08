@@ -1,24 +1,11 @@
 #!/bin/bash
 
+source "$(dirname "$0")/lib/bash_common/init"
+
 ############################################################
-# Find path to libraries
+# Import dependencies
 
-if [ -z "$lib" ] ; then
-    thisdir="$(dirname "$0")"
-    if [ -d "$thisdir/../lib" ] ; then
-        export lib="$thisdir/../lib"
-    else
-        export lib="$thisdir"
-    fi
-fi
+deps=("bash_common" "mkheader")
+import_dep "${deps[@]}"
 
-libs=("common" "mkheader")
-for library in "${libs[@]}" ; do
-    if [ ! -d "$lib" ] ; then
-        >&2 echo "ERROR Could not find library $library. Exiting..."
-        exit 1
-    fi
-done
-
-for f in "$lib/common/"* ; do source "$f" ; done
-export root=$(getroot)
+export xdir=$(getxdir)
