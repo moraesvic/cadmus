@@ -27,8 +27,13 @@ fi
 ############################################################
 # Reading values from environment file
 
-database="$(sed -rn 's/^POSTGRES_DATABASE=(.+)$/\1/p' "$environment_file")"
-uname="$(sed -rn 's/^POSTGRES_USER=(.+)$/\1/p' "$environment_file")"
+lib="$(find_lib)"
+get_env="$lib/bash_common/get_env $environment_file"
+database="$($get_env POSTGRES_DATABASE)"
+uname="$($get_env POSTGRES_USER)"
+
+# database="$(sed -rn 's/^POSTGRES_DATABASE=(.+)$/\1/p' "$environment_file")"
+# uname="$(sed -rn 's/^POSTGRES_USER=(.+)$/\1/p' "$environment_file")"
 
 ############################################################
 # Logging into psql
@@ -47,3 +52,7 @@ EOF
 
 rm "$environment_file"
 echo -e "${done}"
+
+if [ -d "$gitdir/uploads" ] ; then
+	rm -r "$gitdir/uploads"
+fi

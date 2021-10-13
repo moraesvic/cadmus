@@ -95,4 +95,4 @@ function import_dep {
 deps=("bash_common" "mkheader")
 import_dep "${deps[@]}"
 
-export xdir=$(getxdir)
+xdir=$(getxdir)

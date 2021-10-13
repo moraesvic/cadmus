@@ -126,13 +126,22 @@ EOF
 	fi	
 fi
 
-cat > "$environment_file" << EOF 
-POSTGRES_USER=$uname
-POSTGRES_PASSWORD=$passwd
-POSTGRES_HOST=$host
-POSTGRES_DATABASE=$database
-POSTGRES_PORT=$port
-EOF
+touch "$environment_file"
+
+set_env="$lib/bash_common/set_env $environment_file"
+$set_env "POSTGRES_USER" "$uname"
+$set_env "POSTGRES_PASSWORD" "$passwd"
+$set_env "POSTGRES_HOST" "$host"
+$set_env "POSTGRES_DATABASE" "$database"
+$set_env "POSTGRES_PORT" "$port"
+
+# cat > "$environment_file" << EOF 
+# POSTGRES_USER=$uname
+# POSTGRES_PASSWORD=$passwd
+# POSTGRES_HOST=$host
+# POSTGRES_DATABASE=$database
+# POSTGRES_PORT=$port
+# EOF
 
 cat << EOF
 New credentials were saved to file \
