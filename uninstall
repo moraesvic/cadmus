@@ -32,9 +32,6 @@ get_env="$lib/bash_common/get_env $environment_file"
 database="$($get_env POSTGRES_DATABASE)"
 uname="$($get_env POSTGRES_USER)"
 
-# database="$(sed -rn 's/^POSTGRES_DATABASE=(.+)$/\1/p' "$environment_file")"
-# uname="$(sed -rn 's/^POSTGRES_USER=(.+)$/\1/p' "$environment_file")"
-
 ############################################################
 # Logging into psql
 
@@ -48,10 +45,14 @@ psql -c "DROP DATABASE $database; " \
 EOF
 
 ############################################################
-# Removing environment file
+# Unset environment file
 
-rm "$environment_file"
-echo -e "${done}"
+>&2 echo "Unsetting environment file"
+sed -ri "/(POSTGRES_USER|POSTGRES_PASSWORD|POSTGRES_HOST|POSTGRES_DATABASE|POSTGRES_PORT)/d" "$environment_file"
+>&2 echo -e "${done}"
+
+############################################################
+# Remove uploads directory
 
 if [ -d "$gitdir/uploads" ] ; then
 	rm -r "$gitdir/uploads"
